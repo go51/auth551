@@ -5,15 +5,15 @@ type Auth struct{}
 var authInstance *Auth
 
 type Config struct {
-	Form   FormSetting        `json:"form"`
-	Google OauthClientSetting `json:"google"`
+	Form   ConfigForm  `json:"form"`
+	Google ConfigOAuth `json:"google"`
 }
 
-type FormSetting struct {
+type ConfigForm struct {
 	LoginId string `json:"loginId"`
 }
 
-type OauthClientSetting struct {
+type ConfigOAuth struct {
 	ClientId     string   `json:"client_id"`
 	ClientSecret string   `json:"client_secret"`
 	RedirectUrl  string   `json:"redirect_url"`
