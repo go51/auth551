@@ -1,6 +1,9 @@
 package auth551
 
-import "golang.org/x/oauth2"
+import (
+	xoauth2 "golang.org/x/oauth2"
+	"net/http"
+)
 
 type Auth struct {
 	config *Config
@@ -45,7 +48,7 @@ func Load(config *Config) *Auth {
 	return authInstance
 }
 
-func (a *Auth) authConfig(vendor AuthVendor) *oauth2.Config {
+func (a *Auth) authConfig(vendor AuthVendor) *xoauth2.Config {
 	var config ConfigOAuth
 
 	switch vendor {
@@ -55,12 +58,12 @@ func (a *Auth) authConfig(vendor AuthVendor) *oauth2.Config {
 		return nil
 	}
 
-	authConfig := &oauth2.Config{
+	authConfig := &xoauth2.Config{
 		ClientID:     config.ClientId,
 		ClientSecret: config.ClientSecret,
 		RedirectURL:  config.RedirectUrl,
 		Scopes:       config.Scope,
-		Endpoint: oauth2.Endpoint{
+		Endpoint: xoauth2.Endpoint{
 			AuthURL:  config.AuthUrl,
 			TokenURL: config.TokenUrl,
 		},
@@ -73,10 +76,10 @@ func (a *Auth) authConfig(vendor AuthVendor) *oauth2.Config {
 func (a *Auth) AuthCodeUrl(vendor AuthVendor) string {
 	authConfig := a.authConfig(vendor)
 
-	return authConfig.AuthCodeURL("", oauth2.SetAuthURLParam("access_type", "offline"))
+	return authConfig.AuthCodeURL("", xoauth2.SetAuthURLParam("access_type", "offline"))
 }
 
-func (a *Auth) TokenExchange(vendor AuthVendor, code string) *oauth2.Token {
+func (a *Auth) TokenExchange(vendor AuthVendor, code string) *xoauth2.Token {
 	authConfig := a.authConfig(vendor)
 
 	token, err := authConfig.Exchange(nil, code)
@@ -85,4 +88,9 @@ func (a *Auth) TokenExchange(vendor AuthVendor, code string) *oauth2.Token {
 	}
 
 	return token
+}
+
+func (a *Auth) Client(vendor AuthVendor, token *xoauth2.Token) *http.Client {
+	authConfig := a.authConfig(vendor)
+	return authConfig.Client(nil, token)
 }
