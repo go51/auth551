@@ -1,6 +1,8 @@
 package auth551
 
-type Auth struct{}
+type Auth struct {
+	config *Config
+}
 
 var authInstance *Auth
 
@@ -14,6 +16,7 @@ type ConfigForm struct {
 }
 
 type ConfigOAuth struct {
+	Vendor       string   `json:"vendor"`
 	ClientId     string   `json:"client_id"`
 	ClientSecret string   `json:"client_secret"`
 	RedirectUrl  string   `json:"redirect_url"`
@@ -22,12 +25,14 @@ type ConfigOAuth struct {
 	TokenUrl     string   `json:"token_url"`
 }
 
-func Load() *Auth {
+func Load(config *Config) *Auth {
 	if authInstance != nil {
 		return authInstance
 	}
 
-	authInstance = &Auth{}
+	authInstance = &Auth{
+		config: config,
+	}
 
 	return authInstance
 }
