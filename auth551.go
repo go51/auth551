@@ -45,14 +45,14 @@ func Load(config *Config) *Auth {
 	return authInstance
 }
 
-func (a *Auth) AuthCodeUrl(vendor AuthVendor) string {
+func (a *Auth) authConfig(vendor AuthVendor) *oauth2.Config {
 	var config ConfigOAuth
 
 	switch vendor {
 	case VENDOR_GOOGLE:
 		config = a.config.Google
 	default:
-		return ""
+		return nil
 	}
 
 	authConfig := &oauth2.Config{
@@ -66,5 +66,23 @@ func (a *Auth) AuthCodeUrl(vendor AuthVendor) string {
 		},
 	}
 
+	return authConfig
+
+}
+
+func (a *Auth) AuthCodeUrl(vendor AuthVendor) string {
+	authConfig := a.authConfig(vendor)
+
 	return authConfig.AuthCodeURL("", oauth2.SetAuthURLParam("access_type", "offline"))
+}
+
+func (a *Auth) TokenExchange(vendor AuthVendor, code string) *oauth2.Token {
+	authConfig := a.authConfig(vendor)
+
+	token, err := authConfig.Exchange(nil, code)
+	if err != nil {
+		return nil
+	}
+
+	return token
 }
