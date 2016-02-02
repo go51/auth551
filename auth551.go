@@ -1,5 +1,7 @@
 package auth551
 
+import "golang.org/x/oauth2"
+
 type Auth struct {
 	config *Config
 }
@@ -25,6 +27,12 @@ type ConfigOAuth struct {
 	TokenUrl     string   `json:"token_url"`
 }
 
+type AuthVendor string
+
+const (
+	VENDOR_GOOGLE AuthVendor = "google"
+)
+
 func Load(config *Config) *Auth {
 	if authInstance != nil {
 		return authInstance
@@ -35,4 +43,28 @@ func Load(config *Config) *Auth {
 	}
 
 	return authInstance
+}
+
+func (a *Auth) AuthCodeUrl(vendor AuthVendor) string {
+	var config ConfigOAuth
+
+	switch vendor {
+	case VENDOR_GOOGLE:
+		config = a.config.Google
+	default:
+		return ""
+	}
+
+	authConfig := &oauth2.Config{
+		ClientID:     config.ClientId,
+		ClientSecret: config.ClientSecret,
+		RedirectURL:  config.RedirectUrl,
+		Scopes:       config.Scope,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  config.AuthUrl,
+			TokenURL: config.TokenUrl,
+		},
+	}
+
+	return authConfig.AuthCodeURL("", oauth2.SetAuthURLParam("access_type", "offline"))
 }
