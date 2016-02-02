@@ -1,9 +1,9 @@
 package auth551
 
 import (
-	"time"
 	"database/sql"
 	"github.com/go51/model551"
+	"time"
 )
 
 //--[ User Model ]--------
@@ -19,6 +19,14 @@ type UserModel struct {
 	PasswordSalt   string
 	Password       string
 	DeletedAt      time.Time `db_delete:"true"`
+}
+
+func NewUserModel() interface{} {
+	return UserModel{}
+}
+
+func NewUserModelPointer() interface{} {
+	return &UserModel{}
 }
 
 func (m *UserModel) SetId(id int64) {
@@ -77,6 +85,7 @@ func (m *UserModel) SqlValues(sqlType model551.SqlType) []interface{} {
 	return values
 
 }
+
 //--[/User Model ]--------
 
 //--[ User Token Model ]--------
@@ -91,6 +100,14 @@ type UserTokenModel struct {
 	RefreshToken string
 	TokenType    string
 	DeletedAt    time.Time `db_delete:"true"`
+}
+
+func NewUserTokenModel() interface{} {
+	return UserTokenModel{}
+}
+
+func NewUserTokenModelPointer() interface{} {
+	return &UserTokenModel{}
 }
 
 func (m *UserTokenModel) SetId(id int64) {
@@ -146,4 +163,5 @@ func (m *UserTokenModel) SqlValues(sqlType model551.SqlType) []interface{} {
 
 	return values
 }
+
 //--[/User Token Model ]--------
