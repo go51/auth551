@@ -99,6 +99,7 @@ type UserTokenModel struct {
 	Expiry       time.Time
 	RefreshToken string
 	TokenType    string
+	AccountId    string
 	DeletedAt    time.Time `db_delete:"true"`
 }
 
@@ -129,6 +130,7 @@ func (m *UserTokenModel) Scan(rows sql.Rows) error {
 		&m.Expiry,
 		&m.RefreshToken,
 		&m.TokenType,
+		&m.AccountId,
 	)
 }
 
@@ -153,6 +155,7 @@ func (m *UserTokenModel) SqlValues(sqlType model551.SqlType) []interface{} {
 	values = append(values, m.Expiry)
 	values = append(values, m.RefreshToken)
 	values = append(values, m.TokenType)
+	values = append(values, m.AccountId)
 
 	if sqlType == model551.SQL_UPDATE {
 		values = append(values, m.Id)
