@@ -30,11 +30,20 @@ type ConfigOAuth struct {
 	TokenUrl     string   `json:"token_url"`
 }
 
-type AuthVendor string
+type AuthVendor int
 
 const (
-	VENDOR_GOOGLE AuthVendor = "google"
+	VENDOR_GOOGLE AuthVendor = iota
 )
+
+func (av AuthVendor) String() string {
+	switch av {
+	case VENDOR_GOOGLE:
+		return "Google"
+	default:
+		return "Unknown"
+	}
+}
 
 func Load(config *Config) *Auth {
 	if authInstance != nil {
