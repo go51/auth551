@@ -90,7 +90,7 @@ func (m *UserModel) SqlValues(sqlType model551.SqlType) []interface{} {
 
 //--[ User Token Model ]--------
 type UserTokenModel struct {
-	Id           int64 `db_table:""user_tokens`
+	Id           int64 `db_table:"user_tokens"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	UserId       int64
