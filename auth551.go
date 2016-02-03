@@ -79,15 +79,15 @@ func (a *Auth) AuthCodeUrl(vendor AuthVendor) string {
 	return authConfig.AuthCodeURL("", xoauth2.SetAuthURLParam("access_type", "offline"))
 }
 
-func (a *Auth) TokenExchange(vendor AuthVendor, code string) *xoauth2.Token {
+func (a *Auth) TokenExchange(vendor AuthVendor, code string) (*xoauth2.Token, error) {
 	authConfig := a.authConfig(vendor)
 
 	token, err := authConfig.Exchange(nil, code)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	return token
+	return token, nil
 }
 
 func (a *Auth) Client(vendor AuthVendor, token *xoauth2.Token) *http.Client {
