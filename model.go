@@ -13,7 +13,7 @@ type UserModel struct {
 	UpdatedAt      time.Time
 	Locked         bool
 	Enabled        bool
-	Name           bool
+	Name           string
 	Email          string
 	EmailCanonical string
 	PasswordSalt   string
