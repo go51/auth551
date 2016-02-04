@@ -13,7 +13,7 @@ var authInstance *Auth
 
 type Config struct {
 	MasterKey     string      `json:"master_key"`
-	CookieKeyName string      `json:"cookie_key_ame"`
+	CookieKeyName string      `json:"cookie_key_name"`
 	Form          ConfigForm  `json:"form"`
 	Google        ConfigOAuth `json:"google"`
 }
