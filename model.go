@@ -3,7 +3,6 @@ package auth551
 import (
 	"database/sql"
 	"github.com/go51/model551"
-	"github.com/go51/mysql551"
 	"time"
 )
 
@@ -153,9 +152,9 @@ func (m *UserTokenModel) SqlValues(sqlType model551.SqlType) []interface{} {
 	values = append(values, m.UserId)
 	values = append(values, m.Vendor)
 	values = append(values, m.AccessToken)
-	values = append(values, mysql551.ToNil(m.Expiry))
-	values = append(values, mysql551.ToNil(m.RefreshToken))
-	values = append(values, mysql551.ToNil(m.TokenType))
+	values = append(values, m.Expiry)
+	values = append(values, m.RefreshToken)
+	values = append(values, m.TokenType)
 	values = append(values, m.AccountId)
 
 	if sqlType == model551.SQL_UPDATE {
