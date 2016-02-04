@@ -105,3 +105,11 @@ func (a *Auth) Client(vendor AuthVendor, token *xoauth2.Token) *http.Client {
 	authConfig := a.authConfig(vendor)
 	return authConfig.Client(nil, token)
 }
+
+func (a *Auth) MasterKey() string {
+	return a.config.MasterKey
+}
+
+func (a *Auth) CookieKeyName() string {
+	return a.config.CookieKeyName
+}
