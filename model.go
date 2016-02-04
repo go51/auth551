@@ -38,7 +38,7 @@ func (m *UserModel) GetId() int64 {
 	return m.Id
 }
 
-func (m *UserModel) Scan(rows sql.Rows) error {
+func (m *UserModel) Scan(rows *sql.Rows) error {
 	return rows.Scan(
 		&m.Id,
 		&m.CreatedAt,
@@ -120,7 +120,7 @@ func (m *UserTokenModel) GetId() int64 {
 	return m.Id
 }
 
-func (m *UserTokenModel) Scan(rows sql.Rows) error {
+func (m *UserTokenModel) Scan(rows *sql.Rows) error {
 	return rows.Scan(
 		&m.Id,
 		&m.CreatedAt,
