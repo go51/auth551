@@ -12,8 +12,10 @@ type Auth struct {
 var authInstance *Auth
 
 type Config struct {
-	Form   ConfigForm  `json:"form"`
-	Google ConfigOAuth `json:"google"`
+	MasterKey     string      `json:"master_key"`
+	CookieKeyName string      `json:"cookie_key_ame"`
+	Form          ConfigForm  `json:"form"`
+	Google        ConfigOAuth `json:"google"`
 }
 
 type ConfigForm struct {
