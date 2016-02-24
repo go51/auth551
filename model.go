@@ -18,6 +18,7 @@ type UserModel struct {
 	EmailCanonical string
 	PasswordSalt   string
 	Password       string
+	Thumbnail      string
 	DeletedAt      time.Time `db_delete:"true"`
 }
 
@@ -49,11 +50,12 @@ func (m *UserModel) Scan(rows *sql.Rows) error {
 		&m.EmailCanonical,
 		&m.PasswordSalt,
 		&m.Password,
+		&m.Thumbnail,
 	)
 }
 
 func (m *UserModel) SqlValues(sqlType model551.SqlType) []interface{} {
-	values := make([]interface{}, 0, 11)
+	values := make([]interface{}, 0, 12)
 
 	if sqlType == model551.SQL_LOGICAL_DELETE {
 		values = append(values, m.Id)
@@ -74,6 +76,7 @@ func (m *UserModel) SqlValues(sqlType model551.SqlType) []interface{} {
 	values = append(values, m.EmailCanonical)
 	values = append(values, m.PasswordSalt)
 	values = append(values, m.PasswordSalt)
+	values = append(values, m.Thumbnail)
 
 	if sqlType == model551.SQL_UPDATE {
 		values = append(values, m.Id)
