@@ -99,10 +99,13 @@ type UserTokenModel struct {
 	UserId       int64
 	Vendor       string
 	AccessToken  string
+	TokenSecret  string
 	Expiry       time.Time
 	RefreshToken string
 	TokenType    string
 	AccountId    string
+	Name         string
+	Thumbnail    string
 	DeletedAt    time.Time `db_delete:"true"`
 }
 
@@ -130,10 +133,13 @@ func (m *UserTokenModel) Scan(rows *sql.Rows) error {
 		&m.UserId,
 		&m.Vendor,
 		&m.AccessToken,
+		&m.TokenSecret,
 		&m.Expiry,
 		&m.RefreshToken,
 		&m.TokenType,
 		&m.AccountId,
+		&m.Name,
+		&m.Thumbnail,
 	)
 }
 
@@ -155,10 +161,13 @@ func (m *UserTokenModel) SqlValues(sqlType model551.SqlType) []interface{} {
 	values = append(values, m.UserId)
 	values = append(values, m.Vendor)
 	values = append(values, m.AccessToken)
+	values = append(values, m.TokenSecret)
 	values = append(values, m.Expiry)
 	values = append(values, m.RefreshToken)
 	values = append(values, m.TokenType)
 	values = append(values, m.AccountId)
+	values = append(values, m.Name)
+	values = append(values, m.Thumbnail)
 
 	if sqlType == model551.SQL_UPDATE {
 		values = append(values, m.Id)
@@ -171,3 +180,24 @@ func (m *UserTokenModel) SqlValues(sqlType model551.SqlType) []interface{} {
 }
 
 //--[/User Token Model ]--------
+
+//--[ Access Token Model ]--------
+type AccessToken struct {
+	AccessToken  string
+	TokenSecret  string
+	TokenType    string
+	RefreshToken string
+	Expiry       time.Time
+}
+
+//--[/Access Token Model ]--------
+
+//--[ Access Token Model ]--------
+type AccountInformation struct {
+	Id      string
+	Name    string
+	Email   string
+	Picture string
+}
+
+//--[/Access Token Model ]--------
