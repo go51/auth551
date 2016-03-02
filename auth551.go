@@ -1,8 +1,7 @@
 package auth551
 
 import (
-	xoauth2 "golang.org/x/oauth2"
-	"net/http"
+	"errors"
 )
 
 type Auth struct {
@@ -12,17 +11,14 @@ type Auth struct {
 var authInstance *Auth
 
 type Config struct {
-	MasterKey     string      `json:"master_key"`
-	CookieKeyName string      `json:"cookie_key_name"`
-	Form          ConfigForm  `json:"form"`
-	Google        ConfigOAuth `json:"google"`
+	MasterKey     string       `json:"master_key"`
+	CookieKeyName string       `json:"cookie_key_name"`
+	Google        ConfigOAuth2 `json:"google"`
+	Twitter       ConfigOAuth1 `json:"twitter"`
+	Facebook      ConfigOAuth2 `json:"facebook"`
 }
 
-type ConfigForm struct {
-	LoginId string `json:"loginId"`
-}
-
-type ConfigOAuth struct {
+type ConfigOAuth2 struct {
 	Vendor       string   `json:"vendor"`
 	ClientId     string   `json:"client_id"`
 	ClientSecret string   `json:"client_secret"`
@@ -32,18 +28,56 @@ type ConfigOAuth struct {
 	TokenUrl     string   `json:"token_url"`
 }
 
+type ConfigOAuth1 struct {
+	Vendor            string `json:"vendor"`
+	ConsumerKey       string `json:"consumer_key"`
+	ConsumerSecret    string `json:"consumer_secret"`
+	RedirectUrl       string `json:"redirect_url"`
+	AuthorizeTokenUrl string `json:"authorize_token_url"`
+	RequestTokenUrl   string `json:"request_token_url"`
+	AccessTokenUrl    string `json:"access_token_url"`
+}
+
 type AuthVendor int
 
 const (
 	VENDOR_GOOGLE AuthVendor = iota
+	VENDOR_TWITTER
+	VENDOR_FACEBOOK
 )
+
+type AuthInstance interface {
+	AuthCodeUrl() (url, token, secret string)
+	TokenExchange(code, token, secret string) (*AccessToken, error)
+	UserInfo(*AccessToken) (*AccountInformation, error)
+}
 
 func (av AuthVendor) String() string {
 	switch av {
 	case VENDOR_GOOGLE:
-		return "Google"
+		return "google"
+	case VENDOR_TWITTER:
+		return "twitter"
+	case VENDOR_FACEBOOK:
+		return "facebook"
 	default:
-		return "Unknown"
+		return "unknown"
+	}
+}
+
+func AuthVendorCode(vendor string) (AuthVendor, error) {
+	switch vendor {
+	case VENDOR_GOOGLE.String():
+		return VENDOR_GOOGLE, nil
+
+	case VENDOR_TWITTER.String():
+		return VENDOR_TWITTER, nil
+
+	case VENDOR_FACEBOOK.String():
+		return VENDOR_FACEBOOK, nil
+
+	default:
+		return 0, errors.New("unknown vendor.")
 	}
 }
 
@@ -59,51 +93,43 @@ func Load(config *Config) *Auth {
 	return authInstance
 }
 
-func (a *Auth) authConfig(vendor AuthVendor) *xoauth2.Config {
-	var config ConfigOAuth
-
+func (a *Auth) auth(vendor AuthVendor) AuthInstance {
 	switch vendor {
 	case VENDOR_GOOGLE:
-		config = a.config.Google
+		return LoadGoogle(a.config.Google)
+	case VENDOR_TWITTER:
+		return LoadTwitter(a.config.Twitter)
+	case VENDOR_FACEBOOK:
+		return LoadFacebook(a.config.Facebook)
 	default:
 		return nil
 	}
+}
 
-	authConfig := &xoauth2.Config{
-		ClientID:     config.ClientId,
-		ClientSecret: config.ClientSecret,
-		RedirectURL:  config.RedirectUrl,
-		Scopes:       config.Scope,
-		Endpoint: xoauth2.Endpoint{
-			AuthURL:  config.AuthUrl,
-			TokenURL: config.TokenUrl,
-		},
+func (a *Auth) AuthCodeUrl(vendor AuthVendor) (url, token, secret string) {
+	auth := a.auth(vendor)
+	if auth == nil {
+		return "", "", ""
 	}
 
-	return authConfig
-
+	return auth.AuthCodeUrl()
 }
 
-func (a *Auth) AuthCodeUrl(vendor AuthVendor) string {
-	authConfig := a.authConfig(vendor)
+func (a *Auth) UserInfoExchange(vendor AuthVendor, code, token, secret string) (*AccessToken, *AccountInformation, error) {
+	auth := a.auth(vendor)
 
-	return authConfig.AuthCodeURL("", xoauth2.SetAuthURLParam("access_type", "offline"))
-}
-
-func (a *Auth) TokenExchange(vendor AuthVendor, code string) (*xoauth2.Token, error) {
-	authConfig := a.authConfig(vendor)
-
-	token, err := authConfig.Exchange(nil, code)
+	accessToken, err := auth.TokenExchange(code, token, secret)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return token, nil
-}
+	accountInformation, err := auth.UserInfo(accessToken)
+	if err != nil {
+		return nil, nil, err
+	}
 
-func (a *Auth) Client(vendor AuthVendor, token *xoauth2.Token) *http.Client {
-	authConfig := a.authConfig(vendor)
-	return authConfig.Client(nil, token)
+	return accessToken, accountInformation, nil
+
 }
 
 func (a *Auth) MasterKey() string {
