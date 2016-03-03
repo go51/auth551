@@ -93,7 +93,7 @@ func Load(config *Config) *Auth {
 	return authInstance
 }
 
-func (a *Auth) auth(vendor AuthVendor) AuthInstance {
+func (a *Auth) Auth(vendor AuthVendor) AuthInstance {
 	switch vendor {
 	case VENDOR_GOOGLE:
 		return LoadGoogle(a.config.Google)
@@ -107,7 +107,7 @@ func (a *Auth) auth(vendor AuthVendor) AuthInstance {
 }
 
 func (a *Auth) AuthCodeUrl(vendor AuthVendor) (url, token, secret string) {
-	auth := a.auth(vendor)
+	auth := a.Auth(vendor)
 	if auth == nil {
 		return "", "", ""
 	}
@@ -116,7 +116,7 @@ func (a *Auth) AuthCodeUrl(vendor AuthVendor) (url, token, secret string) {
 }
 
 func (a *Auth) UserInfoExchange(vendor AuthVendor, code, token, secret string) (*AccessToken, *AccountInformation, error) {
-	auth := a.auth(vendor)
+	auth := a.Auth(vendor)
 
 	accessToken, err := auth.TokenExchange(code, token, secret)
 	if err != nil {
