@@ -52,6 +52,10 @@ type AuthInstance interface {
 	UserInfo(*AccessToken) (*AccountInformation, error)
 }
 
+type TweetInstance interface {
+	Tweet(accessToken *AccessToken, tweet *TweetModel) error
+}
+
 func (av AuthVendor) String() string {
 	switch av {
 	case VENDOR_GOOGLE:

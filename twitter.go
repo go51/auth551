@@ -3,6 +3,7 @@ package auth551
 import (
 	"encoding/json"
 	"github.com/mrjones/oauth"
+	"strconv"
 )
 
 type authTwitter struct {
@@ -93,8 +94,41 @@ func (a *authTwitter) UserInfo(accessToken *AccessToken) (*AccountInformation, e
 	return accountInformation, nil
 }
 
+func (a *authTwitter) Tweet(accessToken *AccessToken, tweet *TweetModel) error {
+	token := &oauth.AccessToken{
+		Token:  accessToken.AccessToken,
+		Secret: accessToken.TokenSecret,
+	}
+
+	param := map[string]string{
+		"status":              tweet.Status,
+		"lat":                 strconv.FormatFloat(tweet.Lat, 'f', 9, 64),
+		"long":                strconv.FormatFloat(tweet.Long, 'f', 9, 64),
+		"display_coordinates": "false",
+	}
+
+	res, err := a.consumer.PostForm(
+		"https://api.twitter.com/1.1/statuses/update.json",
+		param,
+		token,
+	)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	return nil
+}
+
 type myTwitterAccount struct {
 	Id      string `json:"id_str"`
 	Name    string `json:"name"`
 	Picture string `json:"profile_image_url_https"`
+}
+
+type TweetModel struct {
+	Status             string
+	Lat                float64
+	Long               float64
+	DisplayCoordinates bool
 }
