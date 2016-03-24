@@ -77,7 +77,7 @@ func (m *UserModel) SqlValues(sqlType model551.SqlType) []interface{} {
 	values = append(values, m.Email)
 	values = append(values, m.EmailCanonical)
 	values = append(values, m.PasswordSalt)
-	values = append(values, m.PasswordSalt)
+	values = append(values, m.Password)
 	values = append(values, m.Thumbnail)
 	values = append(values, m.Serial)
 
